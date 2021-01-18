@@ -23,6 +23,10 @@ const findFips = (d, ed) => {
     }
 }
 
+// create colour scale
+var threshold = d3.scaleThreshold()
+    .domain([10, 20, 30, 40, 50, 60, 80])
+    .range(["#D85A86", "#E48BAA", "#ECACC3", "#C5D7E8", "#C5a7E8", "#C556E8", "#Ce47E8"])
 
 // get data
 d3.queue()
@@ -40,15 +44,13 @@ function makeMap(error, us, education) {
         .append('path')
         .attr('class', 'county')
         .attr('data-fips', d => d.id)
-        .attr('education', d => {
+        .attr('data-education', d => {
             return findFips(d, education)
         })
         .style('fill', d => {
             const e = findFips(d, education)
-            console.log(e.bachelorsOrHigher)
-            if (e.bachelorsOrHigher > 40) {
-                return '#56ea46'
-            }
+            // console.log(e.bachelorsOrHigher)
+            return threshold(e.bachelorsOrHigher)
         })
         .attr('d', path) // don't need a projection?
 
