@@ -11,12 +11,18 @@ const svg = d3.select('body')
     .attr('width', w)
     .attr('height', h)
 
-// define projection
-const proj = d3.geoAlbersUsa()
-
-// create paths
+// create path
 const path = d3.geoPath()
-    .projection(proj)
+
+// create function to join fips from both datasets
+const findFips = (d, ed) => {
+    for (e of ed) {
+        if (e.fips === d.id) {
+            return e
+        }
+    }
+}
+
 
 // get data
 d3.queue()
@@ -34,8 +40,19 @@ function makeMap(error, us, education) {
         .append('path')
         .attr('class', 'county')
         .attr('data-fips', d => d.id)
-        .attr('d', d3.geoPath())
+        .attr('education', d => {
+            return findFips(d, education)
+        })
+        .style('fill', d => {
+            const e = findFips(d, education)
+            console.log(e.bachelorsOrHigher)
+            if (e.bachelorsOrHigher > 40) {
+                return '#56ea46'
+            }
+        })
+        .attr('d', path) // don't need a projection?
 
-    // console.log(topojson.feature(us, us.objects.counties).features)
+    // joinData(us, education)
 
 }
+
