@@ -4,12 +4,14 @@ const urlCounties = 'https://cdn.freecodecamp.org/testable-projects-fcc/data/cho
 // width and height of svg
 const h = 600
 const w = 1000
+const ptop = 50
 
 // append svg
 const svg = d3.select('body')
     .append('svg')
     .attr('width', w)
     .attr('height', h)
+
 
 // create path
 const path = d3.geoPath()
@@ -25,8 +27,8 @@ const findFips = (d, ed) => {
 
 // create colour scale
 var threshold = d3.scaleThreshold()
-    .domain([10, 20, 30, 40, 50, 60, 80])
-    .range(["#D85A86", "#E48BAA", "#ECACC3", "#C5D7E8", "#C5a7E8", "#C556E8", "#Ce47E8"])
+    .domain([10, 25, 30, 35, 40, 45, 50])
+    .range(["#6A040F", "#9D0208", "#D00000", "#DC2F02", "#E85D04", "#F48C06", "#FAA307"])
 
 // get data
 d3.queue()

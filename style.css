@@ -10,3 +10,7 @@ body {
     stroke: black;
 
 }
+
+svg {
+    /* padding-top: 50px; */
+}
