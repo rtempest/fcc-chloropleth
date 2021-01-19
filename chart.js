@@ -30,8 +30,6 @@ const tooltip = d3.select('body')
     .append('div')
     .attr('id', 'tooltip')
 
-
-
 // create colour scale
 var threshold = d3.scaleThreshold()
     .domain([10, 15, 20, 25, 30, 40, 60])
@@ -54,7 +52,7 @@ function makeMap(error, us, education) {
         .attr('class', 'county')
         .attr('data-fips', d => d.id)
         .attr('data-education', d => {
-            return findFips(d, education)
+            return findFips(d, education).bachelorsOrHigher
         })
         .style('fill', d => {
             const e = findFips(d, education)
@@ -66,15 +64,21 @@ function makeMap(error, us, education) {
         .on('mouseover', (d) => {
             const ed = findFips(d, education)
             tooltip.style('visibility', 'visible')
-                .style('top', '500px')
-                .style('left', '500px')
-                .html(`<p>${ed.area_name},${ed.state}</p>`)
+                .style('left', d3.event.pageX + 20 + "px")
+                .style('top', `${d3.event.pageY}px`)
+                .attr('data-education', ed.bachelorsOrHigher)
+                .html(`<p>${ed.area_name}, ${ed.state}</p><p>${ed.bachelorsOrHigher}%`)
         })
-        .on('mouseout', () => {
-            tooltip.style('visibility', 'hidden')
-        })
+        .on('mouseout', () => tooltip.style('visibility', 'hidden'))
 
-
+    // append state boundary paths
+    svg.append('path')
+        .datum(topojson.mesh(us, us.objects.states, function (a, b) { return a !== b; }))
+        .style('fill', 'none')
+        .attr("stroke", "black")
+        .style('stroke-width', '1.5px')
+        .attr("stroke-linejoin", "round")
+        .attr("d", path);
 
 }
 
