@@ -25,9 +25,16 @@ const findFips = (d, ed) => {
     }
 }
 
+// create tooltip
+const tooltip = d3.select('body')
+    .append('div')
+    .attr('id', 'tooltip')
+
+
+
 // create colour scale
 var threshold = d3.scaleThreshold()
-    .domain([10, 25, 30, 35, 40, 45, 50])
+    .domain([10, 15, 20, 25, 30, 40, 60])
     .range(["#6A040F", "#9D0208", "#D00000", "#DC2F02", "#E85D04", "#F48C06", "#FAA307"])
 
 // get data
@@ -55,8 +62,19 @@ function makeMap(error, us, education) {
             return threshold(e.bachelorsOrHigher)
         })
         .attr('d', path) // don't need a projection?
+        // append tooltip on mouseover
+        .on('mouseover', (d) => {
+            const ed = findFips(d, education)
+            tooltip.style('visibility', 'visible')
+                .style('top', '500px')
+                .style('left', '500px')
+                .html(`<p>${ed.area_name},${ed.state}</p>`)
+        })
+        .on('mouseout', () => {
+            tooltip.style('visibility', 'hidden')
+        })
 
-    // joinData(us, education)
+
 
 }
 
