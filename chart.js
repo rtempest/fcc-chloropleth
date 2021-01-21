@@ -30,10 +30,6 @@ const tooltip = d3.select('body')
     .append('div')
     .attr('id', 'tooltip')
 
-// create colour scale
-var threshold = d3.scaleThreshold()
-    .domain([10, 15, 20, 25, 30, 40, 60])
-    .range(["#6A040F", "#9D0208", "#D00000", "#DC2F02", "#E85D04", "#F48C06", "#FAA307"])
 
 // get data
 d3.queue()
@@ -43,6 +39,13 @@ d3.queue()
 
 // make the map with the data
 function makeMap(error, us, education) {
+    const maxEd = d3.max(education.map(x => x.bachelorsOrHigher))
+    const minEd = d3.min(education.map(x => x.bachelorsOrHigher))
+    // create colour scale
+    var threshold = d3.scaleThreshold()
+        .domain([10, 20, 30, 40, 50, maxEd])
+        .range(['#370617', "#9D0208", "#DC2F02", "#E85D04", "#F48C06", '#FFBA08'])
+
     // add counties layer
     g = svg.append('g')
         .selectAll('path')
@@ -56,7 +59,6 @@ function makeMap(error, us, education) {
         })
         .style('fill', d => {
             const e = findFips(d, education)
-            // console.log(e.bachelorsOrHigher)
             return threshold(e.bachelorsOrHigher)
         })
         .attr('d', path) // don't need a projection?
@@ -68,6 +70,7 @@ function makeMap(error, us, education) {
                 .style('top', `${d3.event.pageY}px`)
                 .attr('data-education', ed.bachelorsOrHigher)
                 .html(`<p>${ed.area_name}, ${ed.state}</p><p>${ed.bachelorsOrHigher}%`)
+            console.log(ed.bachelorsOrHigher)
         })
         .on('mouseout', () => tooltip.style('visibility', 'hidden'))
 
@@ -80,5 +83,42 @@ function makeMap(error, us, education) {
         .attr("stroke-linejoin", "round")
         .attr("d", path);
 
+    // legend
+
+    const legendScale = d3.scaleLinear().domain([0, maxEd]).range([0, 230])
+
+    const legendAxis = d3.axisBottom()
+        .scale(legendScale)
+        .tickValues([10, 20, 30, 40, 50])
+
+    const legend = svg.append('g')
+        .attr('id', 'legend')
+        .style('font-size', '6pt')
+        .attr('transform', 'translate(620,30)')
+        .call(legendAxis)
+
+    // legend label
+    svg.append('text')
+        .attr('x', 620)
+        .attr('y', 20)
+        .style('font-size', '7pt')
+        .text('Percentage of people with a bachelors degree or higher')
+
+    legend.selectAll('rect')
+        .data(threshold.range().map(c => {
+            const d = threshold.invertExtent(c);
+            if (d[0] == null) d[0] = legendScale.domain()[0]
+            if (d[1] == null) d[1] = legendScale.domain()[1]
+            return d
+        }))
+        .enter()
+        .append('rect')
+        .attr('class', 'legend-rect')
+        .attr('x', (d) => legendScale(d[0]))
+        .attr('y', 20)
+        .attr('height', 20)
+        .style('opacity', 0.7)
+        .attr('width', (d) => legendScale(d[1]) - legendScale(d[0]))
+        .attr('fill', (d) => threshold(d[0]))
 }
 
