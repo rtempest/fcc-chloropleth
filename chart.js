@@ -70,12 +70,13 @@ function makeMap(error, us, education) {
             tooltip.style('visibility', 'visible')
                 .style('left', d3.event.pageX + 20 + "px")
                 .style('top', `${d3.event.pageY}px`)
+                .style('opacity', '0.9')
                 .attr('data-education', () => {
                     return findFips(d, education).bachelorsOrHigher
                 })
                 .html(`<p>${ed.area_name}, ${ed.state}</p><p>${ed.bachelorsOrHigher}%`)
         })
-        .on('mouseout', () => tooltip.style('visibility', 'hidden'))
+        .on('mouseout', () => tooltip.style('visibility', 'hidden').style('opacity', '0'))
 
     // append state boundary paths
     svg.append('path')
