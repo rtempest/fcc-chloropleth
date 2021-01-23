@@ -1,8 +1,22 @@
+html,body
+{
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden; 
+}
+
 body {
     display: flex;
     flex-direction: column;
- align-items: center;
- font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+svg {
+    padding: 0;
+    margin: 0;
 }
 
 h2 {
@@ -17,7 +31,7 @@ p {
 
 .county {
     fill:none;
-    stroke-width: 0.5pt;
+    stroke-width: 0.1pt;
     stroke: black;
     opacity: 0.7;
 }

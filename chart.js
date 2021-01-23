@@ -21,6 +21,8 @@ const findFips = (d, ed) => {
     for (e of ed) {
         if (e.fips === d.id) {
             return e
+        } else if (!e.fips) {
+            console.log('no fips!')
         }
     }
 }
@@ -61,16 +63,17 @@ function makeMap(error, us, education) {
             const e = findFips(d, education)
             return threshold(e.bachelorsOrHigher)
         })
-        .attr('d', path) // don't need a projection?
+        .attr('d', path)
         // append tooltip on mouseover
         .on('mouseover', (d) => {
             const ed = findFips(d, education)
             tooltip.style('visibility', 'visible')
                 .style('left', d3.event.pageX + 20 + "px")
                 .style('top', `${d3.event.pageY}px`)
-                .attr('data-education', ed.bachelorsOrHigher)
+                .attr('data-education', () => {
+                    return findFips(d, education).bachelorsOrHigher
+                })
                 .html(`<p>${ed.area_name}, ${ed.state}</p><p>${ed.bachelorsOrHigher}%`)
-            console.log(ed.bachelorsOrHigher)
         })
         .on('mouseout', () => tooltip.style('visibility', 'hidden'))
 
@@ -78,8 +81,8 @@ function makeMap(error, us, education) {
     svg.append('path')
         .datum(topojson.mesh(us, us.objects.states, function (a, b) { return a !== b; }))
         .style('fill', 'none')
-        .attr("stroke", "black")
-        .style('stroke-width', '1.5px')
+        .attr("stroke", "#03071E")
+        .style('stroke-width', '0.5px')
         .attr("stroke-linejoin", "round")
         .attr("d", path);
 
@@ -91,16 +94,19 @@ function makeMap(error, us, education) {
         .scale(legendScale)
         .tickValues([10, 20, 30, 40, 50])
 
+    const legendX = 620;
+    const legendY = 60;
+
     const legend = svg.append('g')
         .attr('id', 'legend')
         .style('font-size', '6pt')
-        .attr('transform', 'translate(620,30)')
+        .attr('transform', `translate(${legendX},${legendY})`)
         .call(legendAxis)
 
     // legend label
     svg.append('text')
-        .attr('x', 620)
-        .attr('y', 20)
+        .attr('x', legendX)
+        .attr('y', legendY - 22)
         .style('font-size', '7pt')
         .text('Percentage of people with a bachelors degree or higher')
 
@@ -115,7 +121,7 @@ function makeMap(error, us, education) {
         .append('rect')
         .attr('class', 'legend-rect')
         .attr('x', (d) => legendScale(d[0]))
-        .attr('y', 20)
+        .attr('y', legendY - 80)
         .attr('height', 20)
         .style('opacity', 0.7)
         .attr('width', (d) => legendScale(d[1]) - legendScale(d[0]))
